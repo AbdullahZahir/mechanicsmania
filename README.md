@@ -93,9 +93,13 @@ them, so they can be regenerated rather than re-drawn:
 
 | File | Size | For |
 |---|---|---|
-| `logo-square.png` | 1024 × 1024 | avatars, project thumbnails |
+| `logo-mark.png` | 1024 × 1024 | the mark alone, transparent — avatars, favicons |
+| `logo-square.png` | 1024 × 1024 | mark with the wordmark — project thumbnails |
 | `logo-banner.png` | 1200 × 630 | link previews, LinkedIn project media |
-| `logo-source.html` | — | open it in a browser to redraw both |
+| `logo-source.html` | — | open in a browser to redraw all three |
+
+The mark is drawn from the same path data as `frontend/favicon.svg`, so the icon
+and the logo cannot drift apart.
 
 ## Licence
 

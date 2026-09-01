@@ -3,158 +3,76 @@
 <title>MechanicsMania logo</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Spectral:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-<style>body{background:#222;margin:0;display:flex;gap:20px;padding:20px;flex-wrap:wrap}canvas{background:#000}</style>
-<canvas id="sq" width="1024" height="1024" style="width:340px"></canvas>
-<canvas id="wide" width="1200" height="630" style="width:520px"></canvas>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:wght@400;600;700&display=swap" rel="stylesheet">
+<style>body{background:#555;margin:0;display:flex;gap:20px;padding:20px;flex-wrap:wrap}canvas{background:#0003}</style>
+<canvas id="mark"  width="1024" height="1024" style="width:260px"></canvas>
+<canvas id="word"  width="1024" height="1024" style="width:260px"></canvas>
+<canvas id="wide"  width="1200" height="630"  style="width:420px"></canvas>
 <script>
-/* The app's own tokens, so the logo cannot drift from the product. */
-const BG = "#14181c", STAGE = "#10151a", INK = "#e8e6e1",
-      BRASS = "#c9a227", RULE = "#3d4751", MUTED = "#a4a8ad";
+/* The mark is the app's own favicon, redrawn from the identical path data so
+   the two can never drift apart. The favicon is authored in a 64-unit box;
+   everything below scales from that rather than being re-traced by eye. */
+const BG = "#14181c", INK = "#e8e6e1", BRASS = "#c9a227", MUTED = "#a4a8ad";
+const BODY = new Path2D("M32 15c5 7 6 14 6 21v5H26v-5c0-7 1-14 6-21z");
+const FINS = new Path2D("M26 34l-6 9h6M38 34l6 9h-6");
 
-function roundRect(c, x, y, w, h, r) {
-  c.beginPath();
-  c.moveTo(x + r, y);
-  c.arcTo(x + w, y, x + w, y + h, r);
-  c.arcTo(x + w, y + h, x, y + h, r);
-  c.arcTo(x, y + h, x, y, r);
-  c.arcTo(x, y, x + w, y, r);
-  c.closePath();
-}
-
-/* The mark: a pendulum caught mid-swing, with the arc it sweeps and a ghost of
-   where it was. That pairing IS the product — you commit to a prediction, then
-   watch the real apparatus run beside it. It also reads at 32 px, which a
-   busier drawing would not. */
-function mark(c, cx, cy, R, opts) {
-  const o = opts || {};
-  const pivotY = cy - R;
-  const swing = 52 * Math.PI / 180;      // live bob, right of vertical
-  const ghost = -38 * Math.PI / 180;     // ghost bob, left
-
-  // the arc the bob sweeps
+/* Draw the favicon at any size. `disc` paints the dark ground the rocket sits
+   on; turn it off where the canvas already supplies one. */
+function rocket(c, cx, cy, r, disc) {
+  const k = r / 30;                       // the favicon's circle is r=30 of 64
   c.save();
-  c.strokeStyle = RULE;
-  c.lineWidth = Math.max(R * 0.030, 1);
-  c.setLineDash([R * 0.075, R * 0.085]);
-  c.lineCap = "round";
-  c.beginPath();
-  c.arc(cx, pivotY, R, Math.PI / 2 - Math.abs(ghost) - 0.16, Math.PI / 2 + swing + 0.16);
-  c.stroke();
-  c.restore();
-
-  const at = (a) => ({ x: cx + R * Math.sin(a), y: pivotY + R * Math.cos(a) });
-
-  // the ghost: where the prediction put it
-  const g = at(ghost);
-  c.save();
-  c.globalAlpha = 0.42;
-  c.strokeStyle = MUTED;
-  c.lineWidth = Math.max(R * 0.026, 1);
-  c.beginPath(); c.moveTo(cx, pivotY); c.lineTo(g.x, g.y); c.stroke();
-  c.setLineDash([R * 0.05, R * 0.05]);
-  c.lineWidth = Math.max(R * 0.030, 1);
-  c.beginPath(); c.arc(g.x, g.y, R * 0.165, 0, Math.PI * 2); c.stroke();
-  c.restore();
-
-  // the string, and the bob that actually swung
-  const p = at(swing);
-  c.save();
-  c.strokeStyle = INK;
-  c.lineWidth = Math.max(R * 0.040, 1.5);
-  c.lineCap = "round";
-  c.beginPath(); c.moveTo(cx, pivotY); c.lineTo(p.x, p.y); c.stroke();
-  c.restore();
-
-  c.fillStyle = BRASS;
-  c.beginPath(); c.arc(p.x, p.y, R * 0.185, 0, Math.PI * 2); c.fill();
-  // a highlight, so the bob reads as a sphere rather than a dot
-  c.save();
-  c.globalAlpha = 0.55;
-  c.fillStyle = "#e8cf7a";
-  c.beginPath(); c.arc(p.x - R * 0.055, p.y - R * 0.06, R * 0.058, 0, Math.PI * 2); c.fill();
-  c.restore();
-
-  // the pivot
-  c.fillStyle = MUTED;
-  c.beginPath(); c.arc(cx, pivotY, R * 0.055, 0, Math.PI * 2); c.fill();
-
-  // the vertical it is measured from
-  if (o.plumb !== false) {
-    c.save();
-    c.globalAlpha = 0.5;
-    c.strokeStyle = RULE;
-    c.lineWidth = Math.max(R * 0.020, 1);
-    c.setLineDash([R * 0.045, R * 0.06]);
-    c.beginPath(); c.moveTo(cx, pivotY); c.lineTo(cx, pivotY + R * 1.20); c.stroke();
-    c.restore();
+  if (disc !== false) {
+    c.fillStyle = BG;
+    c.beginPath(); c.arc(cx, cy, r, 0, Math.PI * 2); c.fill();
   }
+  c.translate(cx, cy);
+  c.scale(k, k);
+  c.translate(-32, -32);                  // the 64-box centre
+  c.translate(32, 32); c.rotate(-40 * Math.PI / 180); c.translate(-32, -32);
+  c.strokeStyle = BRASS;
+  c.lineWidth = 3;
+  c.lineJoin = "round";
+  c.lineCap = "round";
+  c.stroke(BODY);
+  c.stroke(FINS);
+  c.restore();
 }
 
-// ---------------------------------------------------------------- square
+// -------------------------------------------------- 1. the mark, on its own
 (function () {
-  const c = document.getElementById("sq").getContext("2d");
-  const S = 1024;
-  c.fillStyle = BG; c.fillRect(0, 0, S, S);
-
-  // a plate, so the mark sits on something rather than floating
-  c.save();
-  c.fillStyle = STAGE;
-  roundRect(c, S * 0.055, S * 0.055, S * 0.89, S * 0.89, S * 0.115);
-  c.fill();
-  c.strokeStyle = RULE; c.lineWidth = 3; c.globalAlpha = 0.85;
-  roundRect(c, S * 0.055, S * 0.055, S * 0.89, S * 0.89, S * 0.115);
-  c.stroke();
-  c.restore();
-
-  mark(c, S * 0.5, S * 0.455, S * 0.255);
-
-  c.textAlign = "center";
-  c.fillStyle = INK;
-  c.font = '700 92px Spectral, Georgia, serif';
-  c.fillText("MechanicsMania", S / 2, S * 0.815);
-
-  c.fillStyle = MUTED;
-  c.font = '500 40px "IBM Plex Mono", Consolas, monospace';
-  c.letterSpacing = "4px";
-  c.fillText("AP PHYSICS C", S / 2, S * 0.878);
+  const c = document.getElementById("mark").getContext("2d");
+  c.clearRect(0, 0, 1024, 1024);          // transparent outside the disc
+  rocket(c, 512, 512, 496);
 })();
 
-// ---------------------------------------------------------------- banner
+// -------------------------------------------- 2. the mark with the wordmark
+(function () {
+  const c = document.getElementById("word").getContext("2d");
+  c.fillStyle = BG; c.fillRect(0, 0, 1024, 1024);
+  rocket(c, 512, 430, 300, false);
+  c.textAlign = "center";
+  c.fillStyle = INK;
+  c.font = '700 104px Spectral, Georgia, serif';
+  c.fillText("MechanicsMania", 512, 830);
+})();
+
+// ------------------------------------------------------------- 3. a banner
 (function () {
   const c = document.getElementById("wide").getContext("2d");
   const W = 1200, H = 630;
   c.fillStyle = BG; c.fillRect(0, 0, W, H);
-  c.save();
-  c.strokeStyle = RULE; c.globalAlpha = 0.55; c.lineWidth = 2;
-  c.strokeRect(26, 26, W - 52, H - 52);
-  c.restore();
-
-  mark(c, 268, 300, 156);
-
+  rocket(c, 268, 315, 178, false);
   c.textAlign = "left";
   c.fillStyle = INK;
-  c.font = '700 82px Spectral, Georgia, serif';
-  c.fillText("MechanicsMania", 470, 268);
-
+  c.font = '700 88px Spectral, Georgia, serif';
+  c.fillText("MechanicsMania", 470, 292);
   c.fillStyle = BRASS;
-  c.font = '600 34px Spectral, Georgia, serif';
-  c.fillText("Predict it. Then watch the apparatus.", 470, 330);
-
+  c.font = '600 36px Spectral, Georgia, serif';
+  c.fillText("Predict it. Then watch the apparatus.", 470, 360);
   c.fillStyle = MUTED;
-  c.font = '400 27px "IBM Plex Mono", Consolas, monospace';
-  c.fillText("16 chapters  ·  24 simulations  ·  23 experiments", 470, 392);
-
-  c.save();
-  c.strokeStyle = RULE; c.lineWidth = 2; c.globalAlpha = 0.8;
-  c.beginPath(); c.moveTo(470, 428); c.lineTo(1010, 428); c.stroke();
-  c.restore();
-
-  c.fillStyle = MUTED;
-  c.font = '400 24px Spectral, Georgia, serif';
-  c.fillText("Abdullah Zahir", 470, 470);
+  c.font = '400 28px Spectral, Georgia, serif';
+  c.fillText("Abdullah Zahir", 470, 424);
 })();
 
-window.__png = (id) => document.getElementById(id).toDataURL("image/png");
 document.title = "ready";
 </script>
