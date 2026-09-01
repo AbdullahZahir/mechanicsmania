@@ -1,9 +1,13 @@
 # MechanicsMania
 
+### [www.mechanicsmania.com](https://www.mechanicsmania.com)
+
 An AP Physics C: Mechanics workbench — a solver that shows its working, a sandbox
 that integrates the real equations, and 23 predict-then-watch minigames.
 
 Founded by **Abdullah Zahir** for the purpose of advancing and easing physics knowledge.
+
+![MechanicsMania](frontend/brand/logo-banner.png)
 
 ---
 
@@ -82,7 +86,17 @@ source you read is the source that runs.
 - **Nothing on a posed stage may be the answer.** The apparatus draws
   "— work it out" in the slot until a number has been committed.
 
+## Brand assets
+
+`frontend/brand/` holds the logo at two sizes and the canvas source that draws
+them, so they can be regenerated rather than re-drawn:
+
+| File | Size | For |
+|---|---|---|
+| `logo-square.png` | 1024 × 1024 | avatars, project thumbnails |
+| `logo-banner.png` | 1200 × 630 | link previews, LinkedIn project media |
+| `logo-source.html` | — | open it in a browser to redraw both |
+
 ## Licence
 
-Not yet chosen. Add one before sharing the repository publicly — see the
-publication notes.
+Not yet chosen. Add one before sharing the repository publicly.
