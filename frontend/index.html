@@ -1,0 +1,718 @@
+<!doctype html>
+<html lang="en" data-theme="slate">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="description" content="A calculus-based mechanics workbench: solve AP Physics C problems, watch the scenario animate, and read the derivation line by line." />
+<title>MechanicsMania — Mechanics Workbench</title>
+
+<link rel="icon" href="favicon.svg" type="image/svg+xml" />
+<link rel="apple-touch-icon" href="favicon.svg" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&family=Kalam:wght@400&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<div id="bg-field" aria-hidden="true"></div>
+
+<!-- Reusable vector art. Referenced by <use> so a glyph is defined once. -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <symbol id="mark-logo" viewBox="0 0 64 64">
+      <circle cx="32" cy="32" r="30" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.45"/>
+      <ellipse cx="32" cy="32" rx="29" ry="12.5" fill="none" stroke="currentColor" stroke-width="1.25"
+               opacity="0.5" transform="rotate(28 32 32)"/>
+      <g transform="rotate(-40 32 32)" fill="none" stroke="currentColor" stroke-width="2.4"
+         stroke-linejoin="round" stroke-linecap="round">
+        <path d="M32 13c5.4 7.2 7 14.6 7 21.6V41H25v-6.4C25 27.6 26.6 20.2 32 13z"/>
+        <path d="M25 33.5l-6.4 9.6h6.4M39 33.5l6.4 9.6H39"/>
+        <circle cx="32" cy="26" r="3.1" stroke-width="2"/>
+      </g>
+      <g stroke="currentColor" stroke-width="2.2" stroke-linecap="round" opacity="0.75"
+         transform="rotate(-40 32 32)">
+        <path d="M29 45.5v3.5M32 45.5v5.5M35 45.5v3.5"/>
+      </g>
+    </symbol>
+
+    <symbol id="i-back" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+      <path d="M19 12H5M11 18l-6-6 6-6"/>
+    </symbol>
+    <symbol id="i-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round">
+      <path d="M18 6L6 18M6 6l12 12"/>
+    </symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round">
+      <circle cx="12" cy="12" r="4"/>
+      <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>
+    </symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z"/>
+    </symbol>
+    <symbol id="i-replay" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+      <path d="M3 12a9 9 0 109-9 9 9 0 00-6.4 2.6L3 8"/><path d="M3 3v5h5"/>
+    </symbol>
+
+    <symbol id="i-balance" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+            stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 3v18M5 21h14M3 8h18M6 8l-3 6h6zM18 8l-3 6h6z"/>
+    </symbol>
+    <symbol id="i-flywheel" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+            stroke-linecap="round">
+      <circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="2.4"/>
+      <path d="M12 4v3.6M12 16.4V20M4 12h3.6M16.4 12H20"/>
+    </symbol>
+    <symbol id="i-ramp" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+            stroke-linecap="round" stroke-linejoin="round">
+      <path d="M3 20h18L3 6z"/><circle cx="9" cy="13" r="2.6"/>
+    </symbol>
+    <symbol id="i-loop" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+            stroke-linecap="round" stroke-linejoin="round">
+      <path d="M2 19h6a5 5 0 105-5"/><circle cx="15" cy="11" r="5"/>
+    </symbol>
+    <symbol id="i-target" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+            stroke-linecap="round">
+      <circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.4"/><path d="M12 2v3M12 19v3"/>
+    </symbol>
+    <symbol id="i-wave" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+            stroke-linecap="round">
+      <path d="M2 12c2.5-7 5-7 7.5 0s5 7 7.5 0"/>
+    </symbol>
+    <symbol id="i-spring" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+            stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 2v3M12 19v3M7 6l10 2.5L7 11l10 2.5L7 16l10 2.5"/>
+    </symbol>
+    <symbol id="i-pendulum" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+            stroke-linecap="round">
+      <path d="M4 4h16M12 4v11"/><circle cx="12" cy="18" r="3.2"/>
+    </symbol>
+    <symbol id="i-integral" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+            stroke-linecap="round">
+      <path d="M15 4a3 3 0 00-4 3v10a3 3 0 01-4 3"/>
+    </symbol>
+    <symbol id="i-collide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+            stroke-linecap="round">
+      <circle cx="6" cy="12" r="3.4"/><circle cx="18" cy="12" r="3.4"/><path d="M11 12h2"/>
+    </symbol>
+    <symbol id="i-merge" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+            stroke-linecap="round">
+      <circle cx="9" cy="12" r="4"/><circle cx="15" cy="12" r="4"/>
+    </symbol>
+    <symbol id="i-bolt" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+            stroke-linejoin="round">
+      <path d="M13 2L4 14h7l-1 8 9-12h-7z"/>
+    </symbol>
+    <symbol id="i-run" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+            stroke-linecap="round">
+      <circle cx="14" cy="4.5" r="2"/><path d="M9 21l3-5-3-3 1-5 4 3 3 1M8 12l-3 1"/>
+    </symbol>
+    <symbol id="i-hill" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+            stroke-linecap="round" stroke-linejoin="round">
+      <path d="M2 20h20L14 6l-4 7-3-3z"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div id="app">
+
+  <header class="masthead" id="masthead" hidden>
+    <button class="btn btn--icon btn--quiet" id="btn-back" aria-label="Go back one step">
+      <svg aria-hidden="true"><use href="#i-back"/></svg>
+    </button>
+    <button class="masthead__brand" id="brand-home" aria-label="MechanicsMania — return to the start">
+      <svg class="logo" style="color: var(--brass)" aria-hidden="true" viewBox="0 0 64 64"><use href="#mark-logo"/></svg>
+      <span class="masthead__brand-name">MechanicsMania</span>
+    </button>
+    <div class="progress" role="progressbar" aria-label="Progress through this problem"
+         aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progress">
+      <div class="progress__bar" id="progress-bar"></div>
+    </div>
+    <div class="masthead__actions">
+      <button class="btn btn--icon btn--quiet" id="btn-theme" aria-label="Switch to the paper theme">
+        <svg aria-hidden="true"><use href="#i-sun" id="theme-icon"/></svg>
+      </button>
+      <button class="btn btn--icon btn--quiet" id="btn-restart" aria-label="Start over">
+        <svg aria-hidden="true"><use href="#i-close"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- ===================== HOME ===================== -->
+  <main class="screen is-active" id="screen-home">
+    <div class="home">
+      <div class="home__header">
+        <svg class="home__logo" style="color: var(--brass)" aria-hidden="true" viewBox="0 0 64 64"><use href="#mark-logo"/></svg>
+        <div class="home__titles">
+          <h1 class="home__title">MechanicsMania</h1>
+          <p class="home__founder">
+            Founded by <button type="button" class="founder-link" id="btn-founder">Abdullah Zahir</button>
+            for the purpose of advancing and easing physics knowledge.
+          </p>
+          <p class="home__tagline">A workbench for calculus-based mechanics. Solve the problem, watch the scenario run, then read back the derivation.</p>
+        </div>
+        <button class="btn btn--icon btn--quiet" id="btn-theme-home" aria-label="Switch to the paper theme">
+          <svg aria-hidden="true"><use href="#i-sun"/></svg>
+        </button>
+      </div>
+
+      <div class="figures">
+        <figure class="figure">
+          <div class="figure__stage">
+            <canvas id="rocket-canvas"></canvas>
+            <div class="figure__readout" id="rocket-readout"></div>
+          </div>
+          <figcaption><b>Figure 1.</b> Vertical ascent under constant thrust — net force, acceleration, and the kinematics that follow from them.</figcaption>
+        </figure>
+        <figure class="figure">
+          <div class="figure__stage">
+            <canvas id="cradle-canvas"></canvas>
+            <div class="figure__readout" id="cradle-readout"></div>
+          </div>
+          <figcaption><b>Figure 2.</b> Newton's cradle — momentum and kinetic energy conserved across an elastic collision chain.</figcaption>
+        </figure>
+      </div>
+
+      <div class="steps">
+        <div class="step">
+          <span class="step__num">STEP 01</span>
+          <h3>Choose the physics</h3>
+          <p>Sixteen chapters, opening with the multi-concept scenarios that recur on the exam and working back through the ideas they are built from.</p>
+        </div>
+        <div class="step">
+          <span class="step__num">STEP 02</span>
+          <h3>Enter what you know</h3>
+          <p>Answer a short sequence of questions. Leave anything you weren't given blank — the solver works around the gaps.</p>
+        </div>
+        <div class="step">
+          <span class="step__num">STEP 03</span>
+          <h3>See it, then follow it</h3>
+          <p>The scenario animates alongside the answer, and the derivation unfolds step by step as you scroll.</p>
+        </div>
+      </div>
+
+      <div class="home__cta">
+        <button class="btn btn--primary" id="btn-begin">Open the chapter index</button>
+        <button class="btn" id="btn-play">Open the sandbox</button>
+        <button class="btn" id="btn-minigames">Minigames</button>
+        <button class="btn" id="btn-reference">Formula reference</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- ===================== CHAPTERS ===================== -->
+  <main class="screen" id="screen-chapters">
+    <div class="stack">
+      <div class="page-head">
+        <span class="page-head__eyebrow">Contents</span>
+        <h1 class="page-head__title">What are you working on?</h1>
+        <p class="page-head__sub">Each chapter solves for any quantity you're missing, given whatever else you know.</p>
+      </div>
+      <div class="chapters" id="chapter-index"></div>
+      <div class="page-actions">
+        <button class="btn btn--quiet" id="btn-chapters-home">Back to the front page</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- ===================== VARIANT PICKER ===================== -->
+  <main class="screen" id="screen-variants">
+    <div class="stack stack--narrow">
+      <div class="page-head">
+        <span class="page-head__eyebrow" id="variant-eyebrow"></span>
+        <h1 class="page-head__title" id="variant-title"></h1>
+        <p class="page-head__sub" id="variant-sub"></p>
+        <p class="page-head__sub">Picking the right setup narrows down which quantities matter.</p>
+      </div>
+      <div class="options" id="variant-list"></div>
+    </div>
+  </main>
+
+  <!-- ===================== BRIEFING ===================== -->
+  <main class="screen" id="screen-briefing">
+    <div class="stack stack--narrow">
+      <div class="page-head">
+        <span class="page-head__eyebrow" id="briefing-eyebrow"></span>
+        <h1 class="page-head__title">Before you start</h1>
+      </div>
+      <div class="note">
+        <span class="note__label">Key</span>
+        <p id="briefing-text"></p>
+      </div>
+      <p class="aside-note" id="briefing-aside"></p>
+      <div style="margin-top: var(--space-5)">
+        <button class="btn btn--primary btn--block" id="btn-briefing-next">Continue</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- ===================== SETUP PROMPT ===================== -->
+  <main class="screen" id="screen-prompt">
+    <div class="stack stack--narrow">
+      <div class="panel">
+        <span class="prompt__eyebrow">Setting up</span>
+        <h1 class="prompt__question" id="prompt-question"></h1>
+
+        <div class="prompt__choices" id="prompt-choices">
+          <button class="btn btn--block" data-answer="yes">Yes</button>
+          <button class="btn btn--block" data-answer="no">No</button>
+        </div>
+
+        <div class="prompt__field hidden" id="prompt-field">
+          <input class="field" id="prompt-input" type="number" step="any" inputmode="decimal"
+                 aria-labelledby="prompt-question" aria-describedby="prompt-error"
+                 placeholder="Enter a value" />
+          <p class="field-error hidden" id="prompt-error" role="alert"></p>
+          <button class="btn btn--primary btn--block" id="prompt-submit">Continue</button>
+        </div>
+
+        <div class="prompt__field hidden" id="prompt-info">
+          <p class="prompt__statement" id="prompt-info-text"></p>
+          <button class="btn btn--primary btn--block" id="prompt-info-next">Continue</button>
+        </div>
+      </div>
+      <div style="margin-top: var(--space-3); text-align:center">
+        <button class="btn btn--quiet" id="btn-prompt-skip">Skip setup questions</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- ===================== QUANTITY PICKER ===================== -->
+  <main class="screen" id="screen-quantity">
+    <div class="stack">
+      <div class="page-head">
+        <span class="page-head__eyebrow" id="quantity-eyebrow"></span>
+        <h1 class="page-head__title">What are you solving for?</h1>
+        <p class="page-head__sub">Choose the unknown. Everything else becomes an input.</p>
+      </div>
+      <div class="quantities" id="quantity-grid"></div>
+    </div>
+  </main>
+
+  <!-- ===================== VALUE ENTRY ===================== -->
+  <main class="screen" id="screen-value">
+    <div class="stack stack--narrow">
+      <div class="panel">
+        <span class="prompt__eyebrow" id="value-counter"></span>
+        <h1 class="prompt__question" id="value-question"></h1>
+        <div class="prompt__field">
+          <input class="field" id="value-input" type="number" step="any" inputmode="decimal"
+                 aria-labelledby="value-question" aria-describedby="value-error"
+                 placeholder="Leave blank if not given" />
+          <p class="field-error hidden" id="value-error" role="alert"></p>
+          <button class="btn btn--primary btn--block" id="value-submit">Continue</button>
+          <p class="prompt__hint">Press Enter to continue. Skip anything the problem didn't give you.</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ===================== FORCE TALLY ===================== -->
+  <main class="screen" id="screen-tally">
+    <div class="stack stack--narrow">
+      <div class="panel">
+        <span class="prompt__eyebrow">Net force</span>
+        <h1 class="prompt__question">List every force acting on the object</h1>
+        <p class="prompt__statement">Use negative values for forces pointing against your chosen positive direction.</p>
+        <div class="tally" id="tally-rows"></div>
+        <div class="tally__sum" id="tally-sum" role="status" aria-live="polite">ΣF = 0.00 N</div>
+        <p class="field-error hidden" id="tally-error" role="alert"></p>
+        <div class="prompt__field" style="margin-top: var(--space-4)">
+          <button class="btn btn--block" id="tally-add">Add another force</button>
+          <button class="btn btn--primary btn--block" id="tally-done">Compute net force</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ===================== RESULTS ===================== -->
+  <main class="screen" id="screen-results">
+    <div class="results">
+      <section class="viewport" aria-label="Diagram of the scenario">
+        <div class="viewport__tabs" role="tablist" aria-label="Diagram view">
+          <button class="tab is-selected" role="tab" id="tab-scene" aria-selected="true"
+                  aria-controls="viewport-panel" data-mode="scene" tabindex="0">Scene</button>
+          <button class="tab" role="tab" id="tab-freebody" aria-selected="false"
+                  aria-controls="viewport-panel" data-mode="freebody" tabindex="-1">Free body</button>
+          <button class="tab" role="tab" id="tab-graphs" aria-selected="false"
+                  aria-controls="viewport-panel" data-mode="graphs" tabindex="-1">Graphs</button>
+        </div>
+        <div class="viewport__panel" id="viewport-panel" role="tabpanel" aria-labelledby="tab-scene">
+          <canvas id="scene-canvas" role="img" aria-label="Animated diagram of the scenario"
+                  aria-describedby="viewport-label"></canvas>
+        </div>
+        <span class="viewport__label" id="viewport-label"></span>
+        <div class="viewport__controls">
+          <button class="btn btn--icon" id="btn-replay" aria-label="Restart the animation">
+            <svg aria-hidden="true"><use href="#i-replay"/></svg>
+          </button>
+        </div>
+      </section>
+
+      <section class="answer" aria-live="polite">
+        <div class="skeleton hidden" id="answer-skeleton">
+          <div class="skeleton__bar skeleton__bar--sm"></div>
+          <div class="skeleton__bar skeleton__bar--lg"></div>
+          <div class="skeleton__bar"></div>
+          <div class="skeleton__bar skeleton__bar--sm"></div>
+        </div>
+
+        <div id="answer-block">
+          <div class="answer__head">
+            <h1 class="answer__label" id="answer-label"></h1>
+            <label class="switch" for="toggle-symbolic">
+              <input type="checkbox" id="toggle-symbolic" />
+              <span>Symbolic first</span>
+            </label>
+          </div>
+
+          <!-- Symbolic-first: the rearranged expression stands alone until the
+               reader chooses to see the number, mirroring an FRQ part (a). -->
+          <div class="symbolic hidden" id="symbolic-block">
+            <code class="symbolic__expr" id="symbolic-expr"></code>
+            <button class="btn btn--block" id="btn-reveal">Reveal the numeric answer</button>
+          </div>
+
+          <p class="answer__value" id="numeric-block">
+            <span id="answer-value">—</span>
+            <span class="answer__unit" id="answer-unit"></span>
+          </p>
+          <p class="answer__caveat hidden" id="answer-caveat"></p>
+          <div class="answer__equations">
+            <div>
+              <span class="equation__label">Relationship used</span>
+              <code class="equation__body" id="answer-eq"></code>
+            </div>
+            <div>
+              <span class="equation__label">Derived from</span>
+              <code class="equation__body" id="answer-origin"></code>
+            </div>
+          </div>
+        </div>
+
+        <div class="alert hidden" id="results-alert">
+          <span class="alert__title">Not enough information yet</span>
+          <span id="results-alert-text"></span>
+        </div>
+
+        <div class="answer__actions">
+          <button class="btn" id="btn-again">Solve another in this chapter</button>
+          <button class="btn" id="btn-newchapter">Back to chapters</button>
+          <button class="btn btn--quiet" id="btn-home">Start over</button>
+        </div>
+      </section>
+    </div>
+
+    <section class="derivation hidden" id="derivation" aria-label="Step-by-step derivation">
+      <div class="derivation__head">
+        <h2>Derivation</h2>
+        <span>Solve symbolically first, substitute last.</span>
+      </div>
+      <ol class="derivation__steps" id="derivation-steps">
+        <li class="step-line">
+          <div>
+            <span class="step-line__label">Given</span>
+            <span class="step-line__math" id="deriv-given"></span>
+          </div>
+        </li>
+        <li class="step-line hidden" id="deriv-chain-row">
+          <div>
+            <span class="step-line__label">Worked out first</span>
+            <span class="step-line__math" id="deriv-chain"></span>
+          </div>
+        </li>
+        <li class="step-line">
+          <div>
+            <span class="step-line__label">Governing relationship</span>
+            <span class="step-line__math" id="deriv-origin"></span>
+          </div>
+        </li>
+        <li class="step-line">
+          <div>
+            <span class="step-line__label">Rearranged for the unknown</span>
+            <span class="step-line__math" id="deriv-rearranged"></span>
+          </div>
+        </li>
+        <li class="step-line" id="deriv-substitute-row">
+          <div>
+            <span class="step-line__label">Substitute your values</span>
+            <span class="step-line__math" id="deriv-substitute"></span>
+          </div>
+        </li>
+        <li class="step-line step-line--result">
+          <div>
+            <span class="step-line__label">Result</span>
+            <span class="step-line__math" id="deriv-result"></span>
+          </div>
+        </li>
+      </ol>
+    </section>
+
+    <section class="worklog hidden" id="worklog" aria-label="Problems solved this session">
+      <h2>This session</h2>
+      <ol class="worklog__list" id="worklog-list"></ol>
+    </section>
+  </main>
+
+  <!-- ========================= PLAYGROUND ========================= -->
+  <main class="screen" id="screen-play">
+    <div class="playground">
+      <div class="page-back">
+        <button class="btn btn--quiet btn--back" id="play-exit">← All simulations</button>
+      </div>
+      <div class="page-head">
+        <span class="page-head__eyebrow">Sandbox · <span id="play-group"></span></span>
+        <h1 class="page-head__title" id="play-title">Sandbox</h1>
+        <p class="page-head__sub" id="play-blurb"></p>
+      </div>
+
+      <div class="playground__body">
+        <section class="viewport viewport--play" id="play-stage" aria-label="Live physics simulation">
+          <canvas id="play-canvas" role="img" aria-label="Two masses hanging from a pulley"></canvas>
+        </section>
+
+        <aside class="play-panel">
+          <div id="play-controls-host"></div>
+
+          <dl class="play-readout" id="play-readout"></dl>
+
+          <p class="play-note hidden" id="play-static-note" role="status" aria-live="polite"></p>
+
+          <div class="play-controls">
+            <button class="btn btn--primary" id="play-run" disabled>Run</button>
+            <button class="btn" id="play-pause" disabled>Pause</button>
+            <button class="btn" id="play-reset">Reset</button>
+          </div>
+
+          <p class="play-note hidden" id="play-handoff-note" role="status" aria-live="polite"></p>
+          <button class="btn btn--block" id="play-solve">Solve this configuration</button>
+        </aside>
+      </div>
+
+      <section class="play-graph" aria-label="Data analysis">
+        <div class="play-graph__head">
+          <h2 class="play-graph__title">Plot the data</h2>
+          <p class="play-graph__sub">Pick any two recorded quantities. Choose a transform to straighten a curve, and the slope of the resulting line is the constant you are after — the method the experimental-design question asks for.</p>
+        </div>
+        <div class="play-graph__controls">
+          <label for="pg-y">Plot</label>
+          <select class="field" id="pg-y"></select>
+          <label for="pg-x">against</label>
+          <select class="field" id="pg-x"></select>
+          <label for="pg-tf">linearise with</label>
+          <select class="field" id="pg-tf"></select>
+          <button class="btn btn--quiet" id="pg-csv">Export CSV</button>
+        </div>
+        <div class="pg-hints" id="pg-hints" hidden></div>
+        <div class="play-graph__stage">
+          <canvas id="pg-canvas" role="img" aria-label="Chart of the recorded simulation data"></canvas>
+        </div>
+        <p class="play-graph__fit" id="pg-fit" role="status" aria-live="polite"></p>
+      </section>
+    </div>
+  </main>
+
+  <!-- ========================== FOUNDER ========================== -->
+  <main class="screen" id="screen-founder">
+    <div class="stack founder">
+      <div class="page-back">
+        <button class="btn btn--quiet btn--back" id="btn-founder-back">← MechanicsMania</button>
+      </div>
+      <div class="founder__head">
+        <div class="page-head">
+          <span class="page-head__eyebrow">Founder</span>
+          <h1 class="page-head__title">Abdullah Zahir</h1>
+          <p class="page-head__sub">hi, i&rsquo;m abdullah.</p>
+        </div>
+        <div class="founder__socials" id="founder-socials">
+          <a class="social" data-social="instagram" href="#" target="_blank" rel="noopener noreferrer">Instagram</a>
+          <a class="social" data-social="github" href="#" target="_blank" rel="noopener noreferrer">GitHub</a>
+          <a class="social" data-social="linkedin" href="#" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+        </div>
+      </div>
+
+      <section class="founder__intro">
+        <ul class="founder__bullets">
+          <li>i love learning languages</li>
+          <li>i have like a gazillion cousins</li>
+          <li>biggest CR7 fan ever</li>
+          <li>like physics (shoutout dr. sloane, mr. j, mr. mannino and marcy the cat)</li>
+          <li>pcti stem &rsquo;27 graduating class</li>
+          <li>fav anime: violet evergarden</li>
+          <li>lowk got into hiking, my fav nearby: delaware water gap</li>
+          <li>dream destination: Mecca</li>
+          <li>developed MechanicsMania + a few other things for fun</li>
+          <li>contact me on ig if you have any feedback</li>
+        </ul>
+      </section>
+
+      <section class="founder__section">
+        <h2 class="founder__heading">other projects</h2>
+        <div class="founder__projects">
+          <a class="project" href="https://shikhaai.com" target="_blank" rel="noopener noreferrer">
+            <span class="project__name">Shikha AI</span>
+            <span class="project__host">shikhaai.com</span>
+          </a>
+          <a class="project" href="https://learnaiprogram.com" target="_blank" rel="noopener noreferrer">
+            <span class="project__name">Learn AI Program</span>
+            <span class="project__host">learnaiprogram.com</span>
+          </a>
+          <a class="project" href="https://waynegrounded.com" target="_blank" rel="noopener noreferrer">
+            <span class="project__name">Wayne Grounded</span>
+            <span class="project__host">waynegrounded.com</span>
+            <span class="project__role">co-developed</span>
+          </a>
+        </div>
+      </section>
+
+
+    </div>
+  </main>
+
+  <!-- ===================== SECTION INDEXES ===================== -->
+  <main class="screen" id="screen-pick">
+    <div class="stack stack--wide">
+      <div class="page-back">
+        <button class="btn btn--quiet btn--back" id="pick-home">← MechanicsMania</button>
+      </div>
+      <div class="page-head">
+        <span class="page-head__eyebrow" id="pick-eyebrow"></span>
+        <h1 class="page-head__title" id="pick-title"></h1>
+        <p class="page-head__sub" id="pick-sub"></p>
+      </div>
+      <div id="pick-groups"></div>
+    </div>
+  </main>
+
+  <!-- ========================= MINIGAMES ========================= -->
+  <main class="screen" id="screen-minigames">
+    <div class="playground">
+      <div class="page-back">
+        <button class="btn btn--quiet btn--back" id="mg-exit">← All minigames</button>
+      </div>
+      <div class="page-head">
+        <span class="page-head__eyebrow">Minigame</span>
+        <h1 class="page-head__title" id="mg-title">Minigames</h1>
+        <p class="page-head__sub" id="mg-blurb"></p>
+      </div>
+
+      <div class="playground__body">
+        <section class="viewport viewport--play" id="mg-stage" aria-label="Experiment stage">
+          <canvas id="mg-canvas" role="img" aria-label="Experiment diagram"></canvas>
+        </section>
+
+        <aside class="play-panel">
+          <div class="play-field">
+          </div>
+          <div class="play-field" id="mg-difficulty-row">
+            <label for="mg-difficulty">Difficulty</label>
+            <select class="field" id="mg-difficulty"></select>
+          </div>
+
+          <p class="prompt__statement" id="mg-prompt"></p>
+          <dl class="play-readout" id="mg-givens"></dl>
+          <p class="aside-note" id="mg-note"></p>
+
+          <div id="mg-inputs"></div>
+          <p class="field-error hidden" id="mg-error" role="alert"></p>
+
+          <button class="btn btn--primary btn--block" id="mg-submit">Play</button>
+          <button class="btn btn--block" id="mg-next">New round</button>
+
+          <p class="mg-verdict hidden" id="mg-verdict" role="status" aria-live="polite"></p>
+          <p class="play-note hidden" id="mg-feedback" aria-live="polite"></p>
+          <div class="mg-misconception hidden" id="mg-misconception"></div>
+          <pre class="mg-solution hidden" id="mg-solution"></pre>
+        </aside>
+      </div>
+    </div>
+  </main>
+
+  <!-- ===================== MOMENTS OF INERTIA ===================== -->
+  <main class="screen" id="screen-inertia">
+    <div class="reference">
+      <div class="page-back">
+        <button class="btn btn--quiet btn--back" id="btn-inertia-back">← Chapters</button>
+      </div>
+      <div class="page-head">
+        <span class="page-head__eyebrow" id="inertia-eyebrow">Moments of inertia</span>
+        <h1 class="page-head__title">Where each moment of inertia comes from</h1>
+        <p class="page-head__sub">Every one of these is an integral, not a fact to memorise. Choose a body to see the mass element, the set-up, and the evaluation.</p>
+      </div>
+      <div class="inertia-grid" id="inertia-grid"></div>
+      <h2 class="inertia-section">Theorems that save you an integral</h2>
+      <div class="inertia-grid" id="inertia-theorems"></div>
+
+    </div>
+  </main>
+
+  <!-- ===================== INERTIA DETAIL ===================== -->
+  <main class="screen" id="screen-inertia-detail">
+    <div class="reference">
+      <div class="page-back">
+        <button class="btn btn--quiet btn--back" id="btn-detail-back">← All moments of inertia</button>
+        <button class="btn btn--quiet btn--back" id="btn-detail-chapters">Chapters</button>
+      </div>
+      <div class="page-head">
+        <span class="page-head__eyebrow" id="detail-axis"></span>
+        <h1 class="page-head__title" id="detail-name"></h1>
+        <p class="page-head__sub" id="detail-assumes"></p>
+      </div>
+
+      <div class="detail-body">
+        <section class="detail-figure">
+          <div class="detail-canvas-wrap"><canvas id="inertia-canvas"></canvas></div>
+          <p class="detail-formula" id="detail-formula"></p>
+          <div class="detail-calc" id="detail-calc"></div>
+        </section>
+
+        <section class="detail-steps">
+          <h2>Derivation</h2>
+          <ol class="deriv-list" id="detail-derivation"></ol>
+          <p class="detail-remark" id="detail-remark"></p>
+        </section>
+      </div>
+
+      <div class="hidden">
+      </div>
+    </div>
+  </main>
+
+  <!-- ===================== REFERENCE ===================== -->
+  <main class="screen" id="screen-reference">
+    <div class="reference">
+      <div class="page-back">
+        <button class="btn btn--quiet btn--back" id="btn-reference-back">← Chapters</button>
+      </div>
+      <div class="page-head">
+        <span class="page-head__eyebrow" id="reference-eyebrow">Formula reference</span>
+        <h1 class="page-head__title">Formula reference</h1>
+        <p class="page-head__sub">The relationships worth having in front of you, grouped by exam unit. Percentages are the share of the multiple-choice section each unit carries.</p>
+      </div>
+      <div class="reference__grid" id="reference-grid"></div>
+      <p class="source-note" id="reference-source"></p>
+
+    </div>
+  </main>
+
+</div>
+
+<script src="scenarios.js"></script>
+<script src="animate.js"></script>
+<script src="minigames.js"></script>
+<script src="balloondrop.js"></script>
+<script src="flyingpig.js"></script>
+<script src="racegames.js"></script>
+<script src="rampgames.js"></script>
+<script src="topicgames.js"></script>
+<script src="demogames.js"></script>
+<script src="playground.js"></script>
+<script src="playgraph.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

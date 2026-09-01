@@ -1,0 +1,13 @@
+# One-file deploy config for Render (render.com). Point Render at this repo and
+# it reads this; nothing else needs configuring.
+services:
+  - type: web
+    name: mechanicsmania
+    runtime: python
+    plan: free
+    buildCommand: pip install -r backend/requirements.txt
+    startCommand: python -m uvicorn main:app --host 0.0.0.0 --port $PORT --app-dir backend
+    healthCheckPath: /api/config
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12"
