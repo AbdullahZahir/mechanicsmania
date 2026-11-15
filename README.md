@@ -28,6 +28,22 @@ number *first*, then runs the apparatus on **your** number — so a wrong answer
 fails in a way you can see, and the way it fails tells you which mistake you made.
 About 150 named misconceptions are detected by name.
 
+**Earn.** Twelve badges, kept in the top-left corner. Eight **unit badges** come
+from the solver: solve one problem of every type a unit holds and its badge is
+yours — Kinematics, Forces, Momentum, Energy, Rotation, Gravitation,
+Oscillations, and The Classics. The other four are the **Elite Four**, and they
+are earned in the lab rather than on paper:
+
+| Badge | Earned by |
+|---|---|
+| Simulation | running a simulation from every unit in the sandbox |
+| Experiment | scoring a direct hit in an experiment from every unit |
+| Analysis | linearising a run — a straight-line fit of R² ≥ 0.99 — in three simulations |
+| Mastery | a direct hit on the hardest setting of five different experiments |
+
+Progress is stored in the browser only. There is no account and nothing is sent
+anywhere.
+
 ## Running it locally
 
 Requires Python 3.10+.
@@ -59,6 +75,7 @@ backend/
 frontend/
   index.html           every screen, as plain markup
   app.js               screen flow, the solver UI, the minigame host
+  badges.js            the twelve badges: requirements, storage, drawing
   scenarios.js         CHAPTER_FLOW — which chapter has which problem types
   animate.js           the solver's animations and free-body diagrams
   playground.js        the sandbox: integrators, scenarios, drawing
@@ -93,7 +110,10 @@ them, so they can be regenerated rather than re-drawn:
 
 | File | Size | For |
 |---|---|---|
-| `logo-mark.png` | 1024 × 1024 | the mark alone, transparent — avatars, favicons |
+| `logo-400.png` | 400 × 400 | **LinkedIn** — its recommended logo size |
+| `logo-300.png` | 300 × 300 | smaller avatars |
+| `logo-160.png` | 160 × 160 | inline badges, README icons |
+| `logo-mark.png` | 1024 × 1024 | the mark alone, transparent — print, large avatars |
 | `logo-square.png` | 1024 × 1024 | mark with the wordmark — project thumbnails |
 | `logo-banner.png` | 1200 × 630 | link previews, LinkedIn project media |
 | `logo-source.html` | — | open in a browser to redraw all three |
