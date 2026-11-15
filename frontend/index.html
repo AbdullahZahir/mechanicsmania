@@ -116,10 +116,51 @@
             stroke-linecap="round" stroke-linejoin="round">
       <path d="M2 20h20L14 6l-4 7-3-3z"/>
     </symbol>
+
+    <!-- Badge icons. Same 24-unit box and 1.7 stroke as everything above, so a
+         badge reads as part of the app rather than as a sticker on top of it. -->
+    <symbol id="i-arc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+            stroke-linecap="round">
+      <path d="M3 20Q12-3 21 20"/><circle cx="12" cy="8.5" r="1.5" fill="currentColor" stroke="none"/>
+    </symbol>
+    <symbol id="i-orbit" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+            stroke-linecap="round">
+      <circle cx="12" cy="12" r="3.4"/>
+      <ellipse cx="12" cy="12" rx="9.6" ry="4.4" transform="rotate(-24 12 12)"/>
+      <circle cx="20.8" cy="8.1" r="1.5" fill="currentColor" stroke="none"/>
+    </symbol>
+    <symbol id="i-atwood" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+            stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="6" r="3.2"/><path d="M8.8 6v6.5M15.2 6v10"/>
+      <rect x="6.3" y="12.5" width="5" height="4.5" rx="0.8"/>
+      <rect x="12.7" y="16" width="5" height="5" rx="0.8"/>
+    </symbol>
+    <symbol id="i-sliders" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+            stroke-linecap="round">
+      <path d="M4 7h3M11 7h9M4 12h9M17 12h3M4 17h1M9 17h11"/>
+      <circle cx="9" cy="7" r="2"/><circle cx="15" cy="12" r="2"/><circle cx="7" cy="17" r="2"/>
+    </symbol>
+    <symbol id="i-graph" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+            stroke-linecap="round" stroke-linejoin="round">
+      <path d="M4 4v16h16"/><path d="M7.5 16l3.5-4 3 1.5 5-7"/>
+    </symbol>
+    <symbol id="i-star" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+            stroke-linejoin="round">
+      <path d="M12 3.2l2.7 5.5 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/>
+    </symbol>
   </defs>
 </svg>
 
 <div id="app">
+
+  <!-- The badge strip. It lives here, top left, on every screen without a
+       masthead, and is moved into the masthead on the screens that have one.
+       Hidden until the badge module places it: if that module never starts,
+       there is no empty button left in the corner doing nothing. -->
+  <div class="badge-rail" id="badge-rail" hidden>
+    <button class="badge-strip" id="badge-strip" type="button" aria-haspopup="dialog"
+            aria-label="Badges. Open the badge case."></button>
+  </div>
 
   <header class="masthead" id="masthead" hidden>
     <button class="btn btn--icon btn--quiet" id="btn-back" aria-label="Go back one step">
@@ -129,6 +170,7 @@
       <svg class="logo" style="color: var(--brass)" aria-hidden="true" viewBox="0 0 64 64"><use href="#mark-logo"/></svg>
       <span class="masthead__brand-name">MechanicsMania</span>
     </button>
+    <div class="masthead__badges" id="badge-slot"></div>
     <div class="progress" role="progressbar" aria-label="Progress through this problem"
          aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progress">
       <div class="progress__bar" id="progress-bar"></div>
@@ -702,6 +744,28 @@
 
 </div>
 
+<!-- ===================== BADGE CASE ===================== -->
+<dialog class="badge-case" id="badge-case" aria-labelledby="badge-case-title">
+  <div class="badge-case__inner">
+    <header class="badge-case__head">
+      <div>
+        <h2 id="badge-case-title">Badge case</h2>
+        <p id="badge-case-sub"></p>
+      </div>
+      <button class="btn btn--icon btn--quiet" id="badge-case-close" type="button"
+              aria-label="Close the badge case">
+        <svg aria-hidden="true"><use href="#i-close"/></svg>
+      </button>
+    </header>
+    <div class="badge-case__body" id="badge-case-body"></div>
+    <footer class="badge-case__foot">
+      <span id="badge-case-note"></span>
+      <button class="btn btn--quiet" id="badge-reset" type="button">Reset progress</button>
+    </footer>
+  </div>
+</dialog>
+<div class="badge-toast" id="badge-toast" role="status" aria-live="polite"></div>
+
 <script src="scenarios.js"></script>
 <script src="animate.js"></script>
 <script src="minigames.js"></script>
@@ -713,6 +777,7 @@
 <script src="demogames.js"></script>
 <script src="playground.js"></script>
 <script src="playgraph.js"></script>
+<script src="badges.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

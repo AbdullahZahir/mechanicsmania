@@ -1,0 +1,44 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>MechanicsMania logo — small</title>
+<style>body{background:#555;margin:0;display:flex;gap:16px;padding:20px;align-items:flex-start}</style>
+<canvas id="li400" width="400" height="400" style="width:200px"></canvas>
+<canvas id="li300" width="300" height="300" style="width:150px"></canvas>
+<canvas id="li160" width="160" height="160" style="width:160px"></canvas>
+<script>
+const BG = "#14181c", BRASS = "#c9a227";
+const BODY = new Path2D("M32 15c5 7 6 14 6 21v5H26v-5c0-7 1-14 6-21z");
+const FINS = new Path2D("M26 34l-6 9h6M38 34l6 9h-6");
+
+/* Same favicon paths, but the rocket is drawn at 82% of the disc rather than
+   filling it. At 400 px and below the extra ring of dark around the mark is
+   what stops it reading as a smudge -- LinkedIn shows a project thumbnail far
+   smaller than the file you upload, and a mark that touches its own edge loses
+   its silhouette first. Stroke weight is nudged up for the same reason: a
+   hairline that survives at 1024 disappears at 160. */
+function rocket(c, S) {
+  c.clearRect(0, 0, S, S);
+  const r = S / 2;
+  c.fillStyle = BG;
+  c.beginPath(); c.arc(r, r, r, 0, Math.PI * 2); c.fill();
+
+  const k = (r * 0.82) / 30;
+  c.save();
+  c.translate(r, r);
+  c.scale(k, k);
+  c.translate(-32, -32);
+  c.translate(32, 32); c.rotate(-40 * Math.PI / 180); c.translate(-32, -32);
+  c.strokeStyle = BRASS;
+  c.lineWidth = S <= 200 ? 3.6 : S <= 320 ? 3.3 : 3.1;
+  c.lineJoin = "round";
+  c.lineCap = "round";
+  c.stroke(BODY);
+  c.stroke(FINS);
+  c.restore();
+}
+
+[["li400", 400], ["li300", 300], ["li160", 160]].forEach(([id, S]) => {
+  rocket(document.getElementById(id).getContext("2d"), S);
+});
+document.title = "ready";
+</script>

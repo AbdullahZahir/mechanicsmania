@@ -1689,3 +1689,176 @@ button {
   .prompt__choices { flex-direction: column; }
   .worklog__list li { flex-direction: column; gap: var(--space-1); }
 }
+
+/* ============================================================================
+   badges
+   ----------------------------------------------------------------------------
+   Eight round unit badges and four hexagonal lab badges. One medallion drawing
+   serves the strip, the case and the toast, at three sizes.
+   ========================================================================== */
+
+.badge { display: block; flex: 0 0 auto; --badge-tint: var(--brass); }
+.badge--elite { --badge-tint: var(--vector-velocity); }
+.badge__plate { fill: transparent; stroke: var(--line-strong); stroke-width: 1.4; }
+/* The ring is the progress display: it fills as the badge is worked towards. */
+.badge__ring { fill: none; stroke: var(--badge-tint); stroke-width: 2.4; }
+.badge__icon { color: var(--fg-subtle); opacity: 0.8; }
+.badge.is-earned .badge__plate {
+  stroke: var(--badge-tint);
+  fill: var(--bg-raised);
+  fill: color-mix(in srgb, var(--badge-tint) 17%, var(--bg-raised));
+}
+.badge.is-earned .badge__icon { color: var(--badge-tint); opacity: 1; }
+
+/* --- the strip, top left ---------------------------------------------------- */
+.badge-rail {
+  display: flex;
+  padding: var(--space-2) var(--space-4) 0;
+}
+.badge-rail[hidden] { display: none; }
+.masthead__badges { display: flex; flex: 0 0 auto; }
+
+.badge-strip {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 4px 10px 4px 6px;
+  background: transparent;
+  border: var(--border) solid transparent;
+  border-radius: 999px;
+  color: var(--fg-muted);
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease);
+}
+.badge-strip:hover { background: var(--surface-hover); border-color: var(--line); }
+.badge-strip__set { display: inline-flex; gap: 3px; }
+.badge-strip__sep { width: 1px; height: 16px; margin: 0 5px; background: var(--line-strong); }
+.badge-strip__count {
+  margin-left: 7px;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.02em;
+}
+.badge-strip.is-champion .badge-strip__count { color: var(--brass); font-weight: var(--weight-semibold); }
+
+/* Twelve medallions do not fit beside a brand and a progress bar on a narrow
+   screen, so the strip folds down to its count. It stays one tap from the case. */
+@media (max-width: 900px) {
+  .masthead .badge-strip__set, .masthead .badge-strip__sep { display: none; }
+  .masthead .badge-strip__count { margin-left: 0; }
+}
+/* The masthead was drawn for a desktop. On a phone its fixed parts -- two
+   44 px touch targets, the wordmark, and now the badge count -- add up to more
+   than the screen is wide, so the wordmark steps aside (the mark stays, and the
+   button keeps its label) and the spacing tightens. */
+@media (max-width: 560px) {
+  .masthead { gap: var(--space-2); padding-left: var(--space-3); padding-right: var(--space-3); }
+  .masthead__brand-name { display: none; }
+}
+/* A fingertip needs more than 28 px to land on. */
+@media (pointer: coarse) {
+  .badge-strip { min-height: 44px; }
+}
+@media (max-width: 420px) {
+  .badge-strip__set .badge { width: 18px; height: 18px; }
+  .badge-strip { gap: 2px; padding-right: 8px; }
+  .badge-strip__set { gap: 2px; }
+  .badge-strip__sep { margin: 0 3px; }
+}
+
+/* --- the case ---------------------------------------------------------------- */
+.badge-case {
+  width: min(900px, calc(100vw - 2 * var(--space-4)));
+  max-height: calc(100vh - 2 * var(--space-5));
+  padding: 0;
+  border: var(--border) solid var(--line-strong);
+  border-radius: var(--radius-lg);
+  background: var(--bg-raised);
+  color: var(--fg);
+}
+.badge-case::backdrop { background: rgba(0, 0, 0, 0.55); }
+.badge-case__inner { display: flex; flex-direction: column; max-height: inherit; }
+.badge-case__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-5) var(--space-5) var(--space-4);
+  border-bottom: var(--border) solid var(--line);
+}
+.badge-case__head h2 { margin: 0; font-size: var(--text-lg, 1.2rem); }
+.badge-case__head p { margin: var(--space-1) 0 0; color: var(--fg-muted); font-size: var(--text-sm); }
+.badge-case__body { padding: var(--space-4) var(--space-5) var(--space-5); overflow-y: auto; }
+.badge-case__section {
+  margin: var(--space-4) 0 var(--space-3);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+}
+.badge-case__section:first-child { margin-top: 0; }
+.badge-case__section span { text-transform: none; letter-spacing: 0; color: var(--fg-subtle); margin-left: var(--space-2); }
+.badge-case__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-5);
+  border-top: var(--border) solid var(--line);
+  color: var(--fg-subtle);
+  font-size: var(--text-xs);
+}
+
+.badge-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: var(--space-3);
+}
+.badge-card {
+  display: flex;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border: var(--border) solid var(--line);
+  border-radius: var(--radius);
+  background: var(--bg-sunken);
+}
+.badge-card.is-earned { border-color: var(--line-strong); }
+.badge-card__body { min-width: 0; flex: 1; }
+.badge-card__head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-2); }
+.badge-card__head h4 { margin: 0; font-size: var(--text-base); font-weight: var(--weight-semibold); }
+.badge-card__state { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--fg-muted); white-space: nowrap; }
+.badge-card__state.is-earned { color: var(--brass); }
+.badge-card__how { margin: var(--space-1) 0 0; font-size: var(--text-sm); line-height: 1.45; color: var(--fg-muted); }
+.badge-card__todo { margin: var(--space-2) 0 0; font-size: var(--text-xs); line-height: 1.5; color: var(--fg-subtle); }
+.badge-card__todo span { color: var(--fg-muted); font-weight: var(--weight-medium); margin-right: 2px; }
+
+/* --- the toast ---------------------------------------------------------------- */
+.badge-toast {
+  position: fixed;
+  top: 52px;
+  left: var(--space-4);
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-4) var(--space-2) var(--space-3);
+  border: var(--border) solid var(--brass);
+  border-radius: var(--radius-lg);
+  background: var(--bg-raised);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.28);
+  opacity: 0;
+  transform: translateY(-6px);
+  pointer-events: none;
+  transition: opacity 220ms var(--ease), transform 220ms var(--ease);
+}
+.badge-toast.is-shown { opacity: 1; transform: none; }
+.badge-toast strong { display: block; font-size: var(--text-sm); color: var(--fg); }
+.badge-toast span { display: block; font-size: var(--text-xs); color: var(--fg-muted); }
+@media (prefers-reduced-motion: reduce) {
+  .badge-toast { transition: none; transform: none; }
+}

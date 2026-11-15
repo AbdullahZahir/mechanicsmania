@@ -101,6 +101,15 @@ function initTheme() {
    navigation
    ========================================================================== */
 
+/* Every call into the badge module goes through here. Progress tracking is a
+   garnish on the app, not a dependency of it: if badges.js is missing, half
+   loaded, or throws, the solver, the sandbox and the experiments must carry on
+   exactly as if it had never been asked. */
+function badge(method, ...args) {
+  if (typeof Badges === "undefined" || typeof Badges[method] !== "function") return;
+  try { Badges[method](...args); } catch (err) { console.warn("Badges." + method + " failed:", err); }
+}
+
 const CHROMELESS = new Set([
   "screen-home", "screen-chapters", "screen-reference", "screen-minigames",
   "screen-founder", "screen-pick",
@@ -114,6 +123,7 @@ function showScreen(id) {
   $$(".screen").forEach((el) => el.classList.remove("is-active"));
   $(id).classList.add("is-active");
   $("masthead").hidden = CHROMELESS.has(id);
+  badge("place", !CHROMELESS.has(id));
 
   if (id === "screen-home") startHomeFigures();
   else stopHomeFigures();
@@ -282,6 +292,9 @@ async function init() {
   wireFounder();
   wireInertia();
   wireMasthead();
+  // The badges check their requirements against the live configuration, so
+  // they can only start once it has arrived.
+  badge("init", { config: state.config, flow: CHAPTER_FLOW, scenarios: SCENARIOS, games: mgCatalogue });
 
   showScreen("screen-home");
 }
@@ -1693,6 +1706,7 @@ function renderDerivation(data) {
 
 function recordWork(data) {
   if (!data.ok) return;
+  badge("solved", state.varsKey);
   const { name, unit } = splitUnit(data.variableName);
   state.worklog.push({
     context: contextLabel(),
@@ -1924,6 +1938,7 @@ function renderReference() {
 
 function openPlayground(id) {
   if (id && SCENARIOS[id]) playSetScenario(id);
+  graphTouched = false;
   showScreen("screen-play");
   playReset();
   renderPlayControls();
@@ -2048,11 +2063,23 @@ function renderGraphControls() {
    gets nothing from a canvas. Numbers only when the fit is real: the module
    withholds R² below three points and refuses a fit whose transform excluded
    the data, and this line has to be equally honest. */
+/* Set when the reader changes an axis or a transform, cleared when a
+   simulation is opened. The Analysis badge is for linearising a run, and a
+   default plot that happens to be straight is not something anyone did. */
+let graphTouched = false;
+
 function onPlayGraphPainted() {
   const el = $("pg-fit");
   if (!el || typeof PlayGraph === "undefined") return;
   const f = PlayGraph.fit();
   if (!f || f.reason) { el.textContent = f && f.reason ? f.reason : ""; return; }
+  // A quantity plotted against itself is a perfect straight line and proves
+  // nothing, so the two axes have to be different channels to count.
+  const axes = PlayGraph.axes();
+  if (graphTouched && Play.started && axes.x !== axes.y
+      && typeof f.r2 === "number" && f.r2 >= 0.99 && f.n >= 8) {
+    badge("linearised", Play.type);
+  }
   const parts = [`slope = ${formatNumber(f.slope)}`];
   if (PlayGraph.slopeUnit && PlayGraph.slopeUnit()) parts[0] += " " + PlayGraph.slopeUnit();
   parts.push(`intercept = ${formatNumber(f.intercept)}`);
@@ -2066,13 +2093,18 @@ function wireGraphControls() {
   if (typeof PlayGraph === "undefined") return;
   const repaint = () => { paintPlayGraph(); };
   const onAxis = () => {
+    graphTouched = true;
     PlayGraph.setAxes($("pg-y") && $("pg-x") ? $("pg-x").value : undefined,
                       $("pg-y") ? $("pg-y").value : undefined);
     repaint();
   };
   $("pg-x").addEventListener("change", onAxis);
   $("pg-y").addEventListener("change", onAxis);
-  $("pg-tf").addEventListener("change", () => { PlayGraph.setTransform($("pg-tf").value); repaint(); });
+  $("pg-tf").addEventListener("change", () => {
+    graphTouched = true;
+    PlayGraph.setTransform($("pg-tf").value);
+    repaint();
+  });
 
   $("pg-csv").addEventListener("click", () => {
     const csv = PlayGraph.exportCSV();
@@ -2238,6 +2270,9 @@ function wirePlayground() {
     Play.running = true;
     Play.started = true;
     Play.lastFrame = null;
+    // Counted here, past the early return above: a balanced configuration
+    // that never moves is not a simulation anyone ran.
+    badge("simRun", Play.type);
 
     // Reduced motion is handled inside resumePlayLoop, so every route in —
     // Run, Resume, anything later — respects it identically.
@@ -2717,6 +2752,10 @@ function mgSubmit() {
   showFieldError("mg-error", null);
 
   mgRenderVerdict(r);
+  if (r.correct) {
+    const levels = mod.difficulties(mgGameId) || [];
+    badge("hit", mgGameId, levels.indexOf(mgDifficulty), levels.length);
+  }
   $("mg-feedback").textContent = r.feedback;
   $("mg-feedback").classList.remove("hidden");
 
